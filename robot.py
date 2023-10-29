@@ -15,27 +15,27 @@ def echo(message):
     print(f"{str(datetime.datetime.now())[:-8]}\t{message}")
 
 
-async def send_to_gpt(content):
-    openai.proxy = "http://127.0.0.1:10809"
-    openai.api_key = ""
-    response = await openai.ChatCompletion.acreate(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "user", "content": "你需要根据我给出的html内容写出python代码。只给出代码，没有其他任何文字，字符，不要有多余的文字"},
-            {"role": "assistant", "content": "好的，我将只给出python代码"},
-            {"role": "user", "content": '<h3><strong><span style=\"color: #000000;\">输出斐氏数列前n项</span></strong></h3>\n<p>类型：分支结构、简单循环</p>\n<hr />\n<p><b>斐氏数列（第三项开始，每项为相邻前两项的和）：</b></p>\n<p><b>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1, 1, 2, 3, 5, 8, 13, 21, ...</b></p>\n<h4><strong>输入</strong></h4>\n<pre>键盘输入整数n</pre>\n<h4><strong>输出</strong></h4>\n<p>在一行中输出前n项数列元素，元素间用逗号间隔</p>\n<h4><strong>示例</strong></h4>\n<pre class=\"language-python\"><code>输入\n4\n输出\n1,1,2,3\n\n输入\n7\n输出\n1,1,2,3,5,8,13</code></pre>\n<p></p>'},
-            # {"role": "assistant", "content": '字符串分类统计代码如下：```python\ndef fibonacci():\n\ta, b = 1, 1\n\twhile True:\n\t\tyield a\n\t\ta, b = b, a + b\n\nf = fibonacci()\nanswer = ""\nfor _ in range(eval(input())):\n\tanswer += str(next(f))\n\tanswer += ","\nprint(answer.strip(","))\n```'},
-            # {"role": "user", "content": "这不是我要的答案，请不要含有'字符串分类统计代码如下：```python'，只输出代码"},
-            {"role": "assistant", "content": 'def fibonacci():\n\ta, b = 1, 1\n\twhile True:\n\t\tyield a\n\t\ta, b = b, a + b\n\nf = fibonacci()\nanswer = ""\nfor _ in range(eval(input())):\n\tanswer += str(next(f))\n\tanswer += ","\nprint(answer.strip(","))\n'},
-            {"role": "user", "content": content}
-        ]
-    )
-    content = response['choices'][0]['message']['content']
-    if "`" in content:
-        pattern = re.compile(r'`([^`]+)`')
-        return re.match(pattern, content)
-    return content
-    # return re.match(pattern, content)
+# async def send_to_gpt(content):
+#     openai.proxy = "http://127.0.0.1:10809"
+#     openai.api_key = ""
+#     response = await openai.ChatCompletion.acreate(
+#         model="gpt-3.5-turbo",
+#         messages=[
+#             {"role": "user", "content": "你需要根据我给出的html内容写出python代码。只给出代码，没有其他任何文字，字符，不要有多余的文字"},
+#             {"role": "assistant", "content": "好的，我将只给出python代码"},
+#             {"role": "user", "content": '<h3><strong><span style=\"color: #000000;\">输出斐氏数列前n项</span></strong></h3>\n<p>类型：分支结构、简单循环</p>\n<hr />\n<p><b>斐氏数列（第三项开始，每项为相邻前两项的和）：</b></p>\n<p><b>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1, 1, 2, 3, 5, 8, 13, 21, ...</b></p>\n<h4><strong>输入</strong></h4>\n<pre>键盘输入整数n</pre>\n<h4><strong>输出</strong></h4>\n<p>在一行中输出前n项数列元素，元素间用逗号间隔</p>\n<h4><strong>示例</strong></h4>\n<pre class=\"language-python\"><code>输入\n4\n输出\n1,1,2,3\n\n输入\n7\n输出\n1,1,2,3,5,8,13</code></pre>\n<p></p>'},
+#             # {"role": "assistant", "content": '字符串分类统计代码如下：```python\ndef fibonacci():\n\ta, b = 1, 1\n\twhile True:\n\t\tyield a\n\t\ta, b = b, a + b\n\nf = fibonacci()\nanswer = ""\nfor _ in range(eval(input())):\n\tanswer += str(next(f))\n\tanswer += ","\nprint(answer.strip(","))\n```'},
+#             # {"role": "user", "content": "这不是我要的答案，请不要含有'字符串分类统计代码如下：```python'，只输出代码"},
+#             {"role": "assistant", "content": 'def fibonacci():\n\ta, b = 1, 1\n\twhile True:\n\t\tyield a\n\t\ta, b = b, a + b\n\nf = fibonacci()\nanswer = ""\nfor _ in range(eval(input())):\n\tanswer += str(next(f))\n\tanswer += ","\nprint(answer.strip(","))\n'},
+#             {"role": "user", "content": content}
+#         ]
+#     )
+#     content = response['choices'][0]['message']['content']
+#     if "`" in content:
+#         pattern = re.compile(r'`([^`]+)`')
+#         return re.match(pattern, content)
+#     return content
+#     # return re.match(pattern, content)
 
 
 class Python123Robot:
@@ -75,6 +75,7 @@ class Python123Robot:
                     return True
                 else:
                     echo("恢复token失败，将进入正常流程")
+                    self.session.headers.clear()
         location = "/api/v1/session"
         res_json = self.session.put(f"{self.url}{location}", json={
             "email": self.email,
@@ -89,6 +90,7 @@ class Python123Robot:
             with open("token", "w") as f:
                 f.write(self.token)
             return True
+        # print(res_json)
         return False
 
     def get_course(self):
@@ -166,7 +168,7 @@ class Python123Robot:
             result = []
             for i in res_json["data"]:
                 # task.append(self.loop.create_task(send_to_gpt(content=i["content"])))
-                if i["record"]["commits_count"] != 0:
+                if i.get("record") is not None:
                     echo(f"{i['name']}已经提交过了，跳过该问题")
                     continue
                 task_ids.append(i["_id"])
