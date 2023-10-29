@@ -75,7 +75,7 @@ class Python123Robot:
                     return True
                 else:
                     echo("恢复token失败，将进入正常流程")
-                    self.session.headers.clear()
+                    self.session.headers.pop("Authorization")
         location = "/api/v1/session"
         res_json = self.session.put(f"{self.url}{location}", json={
             "email": self.email,
