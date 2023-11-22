@@ -40,6 +40,16 @@ def echo(message):
 
 class Python123Robot:
     def __init__(self):
+        self.token = None
+        self.url = None
+        self.session = None
+        self.initSession()
+        self.courseID = None
+        self.taskID = None
+        self.loop = asyncio.get_event_loop()
+        self.pattern = None
+
+    def initSession(self):
         self.session = requests.session()
         self.url = "https://python123.io"
         self.session.headers.update({
@@ -49,11 +59,7 @@ class Python123Robot:
         self.token = None
         self.session.verify = False
         self.session.get(self.url)
-        self.courseID = None
-        self.taskID = None
-        self.loop = asyncio.get_event_loop()
-        self.pattern = None
-
+        
     def get_info(self):
         location = "/api/v1/user"
         res_json = self.session.get(f"{self.url}{location}").json()
@@ -75,7 +81,8 @@ class Python123Robot:
                     return True
                 else:
                     echo("恢复token失败，将进入正常流程")
-                    self.session.headers.pop("Authorization")
+                    self.initSession()
+                    
         location = "/api/v1/session"
         res_json = self.session.put(f"{self.url}{location}", json={
             "email": self.email,
